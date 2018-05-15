@@ -75,23 +75,14 @@ function draw() {
     if(carList[i].carSprite.velocity.y == 0)
     {
       howManyWaitingThisCycle++;
-    }
-    //carList[i].showCar();
-    
+    }    
 
 
     if(carList[i].carSprite.position.y < -20)
-      carList.splice(i, 1);
-
-
-      
+        carList.splice(i, 1);
   }
 
   carsWaiting = howManyWaitingThisCycle;
-
-  for(var i =0; i < gateList.length; i++)
-  {
-    gateList[i].showLane();
-  }
+  
   drawSprites();
 }

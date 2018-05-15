@@ -3,14 +3,13 @@ function Car(id)
 {
 
 
-  let evaluationPoint = 200;
+  let evaluationPoint = 340;
 
   this.imageNameList = [];
-  this.imageNameList.push('carRed.png');
-  this.imageNameList.push('carYellow.png');
-  this.imageNameList.push('carGreen.png');
-  this.imageNameList.push('carPurple.png');
-  this.imageNameList.push('carBlue.png');
+  this.imageNameList.push('imgs/batmobile.png');
+  this.imageNameList.push('imgs/cop car.png');
+  this.imageNameList.push('imgs/truck2.png');
+  this.imageNameList.push('imgs/yellow car.png');
 
   this.image = loadImage(random(this.imageNameList));
   this.carId = id;
@@ -21,7 +20,7 @@ function Car(id)
   this.xLoc =  200;
 
 
-  this.waitTimer = 500;
+  this.waitTimer = 600;
   this.waited = false;
   this.speed = -1.0;
   this.myLaneIndex = -1;
@@ -30,6 +29,7 @@ function Car(id)
   this.carSprite.addImage(loadImage(random(this.imageNameList)));
   this.carSprite.velocity.y = this.speed;
   this.carSprite.rotateToDirection = true;
+  this.carSprite.scale = .25;
 
   this.collisionFinished = false;
   this.annealCollide = 20;
@@ -43,24 +43,24 @@ function Car(id)
     if(this.carSprite.position.y <= divider.dividerSprite.position.y + evaluationPoint && !this.waited)
     {
       //Stops Car at gateList
-      if(this.carSprite.overlap(divider.dividerSprite) && this.waited == false)
+      if(this.carSprite.overlap(divider.dividerSprite))
       {
           this.carSprite.rotateToDirection = false;
           this.carSprite.velocity.y = 0;
           this.waitingAtGate = true;
 
-          if(frameCount % 20)
-          {  
-            this.waitTimer -= throughPut;
-          }
+          
+      }
+      
+      if(this.waitingAtGate == true)
+      {  
+        this.waitTimer -= throughPut;
       }
       
       if(this.waitTimer <= 0)
       {
-        if(this.myLaneIndex == 2)
-            console.log("Removed");
         this.waited = true;
-        this.carSprite.velocity.y  = this.speed;
+        this.carSprite.velocity.y  = this.speed * 2;
         gateList[this.myLaneIndex].removeCarFromLane();
       }
       
@@ -81,8 +81,25 @@ function Car(id)
           this.carSprite.setSpeed(1.4, -90);
       else if(this.angle < 260 && this.carSprite.position.x <= gateList[this.myLaneIndex].xLoc && this.waitingAtGate == false)  
           this.carSprite.setSpeed(1.4, -90);
-          
       
+      this.removeCarsNotRenderedFromLane(gateList);
+          
+    }
+  }
+  
+  this.removeCarsNotRenderedFromLane = function(gateList)
+  {
+    if(typeof gateList[this.myLaneIndex] != 'undefined')
+    {
+      for(let i = 0; i < gateList[this.myLaneIndex].carQueue.length; i++)
+      {
+        if(gateList[this.myLaneIndex].carQueue[i].carSprite.position.y <  - 10)
+        {
+            gateList[this.myLaneIndex].carQueue.splice(i, 1);
+        }
+      }
+      
+    
     }
   }
 
@@ -93,10 +110,24 @@ function Car(id)
     
     if(indexInLane > 0)
     {
-      if(typeof carQue[indexInLane - 1] != 'undefined')
+      for(let i = 0; i < carQue.length; i++)
+      {
+        if(typeof carQue[i] != 'undefined')
+        {
+          if(this.carSprite.position.y < carQue[i].carSprite.position.y)
+          {
+            this.carSprite.displace(carQue[i].carSprite);
+          }
+          else {
+            carQue[i].carSprite.displace(this.carSprite);
+          }
+        }
+      }
+      
+      /*if(typeof carQue[indexInLane - 1] != 'undefined')
       {
         carQue[indexInLane-1].carSprite.displace(this.carSprite);
-      }
+      }*/
     }
   }
 
